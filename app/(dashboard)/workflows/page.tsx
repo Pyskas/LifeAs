@@ -1,6 +1,9 @@
+import { GetWorkflowsForUser } from '@/actions/workflows/getWorkflowsForUser';
 import { Skeleton } from '@/components/ui/skeleton'
-import { waitFor } from '@/lib/helper/waitFor';
-import React, { Suspense } from 'react'
+import React, { Suspense } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, InboxIcon } from 'lucide-react';
+import CreateWorkflowDialog from './_components/CreateWorkflowDialog';
 
 function page() {
   return (
@@ -12,6 +15,7 @@ function page() {
                     Управление своими рабочими процессами
                 </p>
             </div>
+            <CreateWorkflowDialog />
             </div>
 
         <div className="h-full py-6">
@@ -34,7 +38,34 @@ function UserWorkflowsSkeleton() {
 }
 
 async function UserWorkflows() {
-    await waitFor(3000);
+    const workflows = await GetWorkflowsForUser();
+    if (!workflows) {
+        return (
+        <Alert variant={"destructive"}>
+            <AlertCircle className="w-4 h-4" />
+            <AlertTitle>Ошибка</AlertTitle>
+            <AlertDescription>
+                Что то пошло не так. Пожалуйста попробуйте снова
+            </AlertDescription>
+        </Alert>
+        );
+    }
+
+    if (workflows.length === 0){
+        return <div className="flex flex-col gap-4 h-full items-center">
+            <div className="rounded-full bg-accent w-20 h-20 flex items-center justify-center">
+                <InboxIcon size={40} className="stroke-primary" />
+            </div>
+            <div className="flex flex-col gap-1 text-center">
+                <p className="font-bold">Рабочих процессов не создано</p>
+                <p className="text-sm text-muted-foreground">
+                    Нажмите на кнопку что бы создать ваш первый процесс
+                </p>
+            </div>
+            <CreateWorkflowDialog triggerText="Создайте ваше первое пространство" />
+        </div>
+    }
+
     return <div></div>;
 }
 
