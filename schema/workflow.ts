@@ -5,3 +5,4 @@ export const createWorkflowSchema = z.object({
     description: z.string().max(80).optional(),
 });
 
+export type createWorkflowSchemaType = z.infer<typeof createWorkflowSchema>;
