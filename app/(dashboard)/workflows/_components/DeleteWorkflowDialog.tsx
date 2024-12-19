@@ -1,5 +1,6 @@
 "use client";
 
+import { DeleteWorkflow } from "@/actions/workflows/deleteWorkflow";
 import { AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -11,16 +12,31 @@ import { AlertDialog,
     AlertDialogTrigger,
  } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
  interface Props {
     open: boolean;
     setOpen: (open: boolean) => void;
     workflowName: string;
+    workflowId: string;
  }
 
- function DeleteWorkflowDialog({open, setOpen, workflowName }:Props) {
-    const [confirmText, setConfirmText] = useState("")
+ function DeleteWorkflowDialog({open, setOpen, workflowName, workflowId }:Props) {
+    const [confirmText, setConfirmText] = useState("");
+
+    const deleteMutation= useMutation({
+        mutationFn: DeleteWorkflow,
+        onSuccess: () => {
+            toast.success("Рабочее пространство успешно удалено", {id: workflowId});
+            setConfirmText("");
+        },
+        onError: () => {
+            toast.error("Что то пошло не так", {id: workflowId });
+        },
+    });
+
    return (
      <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
@@ -38,9 +54,14 @@ import { useState } from "react";
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel>Отменить</AlertDialogCancel>
-                <AlertDialogAction disabled={confirmText !== workflowName}
+                <AlertDialogCancel onClick={() => setConfirmText("")}>Отменить</AlertDialogCancel>
+                <AlertDialogAction 
+                disabled={confirmText !== workflowName || deleteMutation.isPending}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() => {
+                    toast.loading("Удаление рабочего пространства...", { id: workflowId });
+                    deleteMutation.mutate(workflowId)
+                }}
                 >Удалить</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
