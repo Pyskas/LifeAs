@@ -47,7 +47,7 @@ function CreateWorkflowDialog({triggerText}: { triggerText?: string }) {
       setOpen(open);
     }}>
         <DialogTrigger asChild>
-            <Button>{triggerText ?? "Создать рабочий процесс"}</Button>
+            <Button>{triggerText ?? "Создать рабочее пространство"}</Button>
         </DialogTrigger>
         <DialogContent className="px-0">
             <CustomDialogHeader 
